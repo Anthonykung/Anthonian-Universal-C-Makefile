@@ -10,7 +10,7 @@
 ##########################################################
 
 # Define Executable Name
-IAEXE := movies
+IAEXE := ia
 
 # Define Standard Version
 CVER := -std=gnu99
