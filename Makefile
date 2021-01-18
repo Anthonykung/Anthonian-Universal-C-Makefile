@@ -38,7 +38,7 @@ MFLAGS := $(IFLAGS) -MMD -MP
 
 # Build
 $(BDIR)/$(IAEXE): $(OBJ)
-	$(CC) $(OBJ) -o $@
+	$(CC) $(CVER) $(CFLAGS) $(OBJ) -o $@
 
 # Get rid of annoying messages
 -include $(DEP)
