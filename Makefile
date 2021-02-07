@@ -45,7 +45,7 @@ $(BDIR)/$(IAEXE): $(OBJ)
 
 # For C Files
 $(BDIR)/%.c.o: %.c
-	mkdir -p $(dir BDIR)
+	mkdir -p $(BDIR)
 	$(CC) $(CVER) $(MFLAGS) $(CFLAGS) -c $< -o $@
 
 # For C++ Files
