@@ -12,6 +12,12 @@
 # Define Executable Name
 IAEXE := ia
 
+# Define ZIP File Name
+FNAME := ia-program.zip
+
+# Define Directories/Files To Ignore In Find Command `-o -name {{name}}` or `-o -path {{path}}` or `-o -iwholename {{name}}`
+IGN := -o -name test -o -name docs
+
 # Define Standard Version
 CVER := -std=gnu99
 
@@ -22,9 +28,13 @@ CC := gcc
 SDIR := .
 
 # Define Build Directory (Where you want the result to go)
-BDIR := .
+BDIR := ./build
 
+# Define Compiler Flags
 CFLAGS := -Wall -ansi -lncurses
+
+# Creat Subdirectories
+SUBDIR := $(shell find $(SDIR) -type d -not \( -path '$(BDIR)' -o -path '$(BDIR)/*' -o -iwholename '*.git*' $(IGN) \) -exec mkdir -p -- $(BDIR)/{} \;)
 
 # Find all C and C++ files
 SRC := $(shell find $(SDIR) -name '*.cpp' -or -name '*.c')
@@ -39,6 +49,7 @@ MFLAGS := $(IFLAGS) -MMD -MP
 # Build
 $(BDIR)/$(IAEXE): $(OBJ)
 	$(CC) $(CVER) $(CFLAGS) $(OBJ) -o $@
+	echo -e "\n\033[38;2;255;20;147m>_ Use \033[96mmake run\033[38;2;255;20;147m to execute, use \033[96mmake debug\033[38;2;255;20;147m to enable debug logs\n"
 
 # Get rid of annoying messages
 -include $(DEP)
@@ -60,8 +71,42 @@ clean:
 	rm -f $(BDIR)/*.o
 	rm -f $(BDIR)/*.d
 	rm -f $(BDIR)/$(IAEXE)
+	rm -rf $(BDIR)/kungc.movies.*
 
 # Delete Entire Build Directory (BEWARE OF YOUR ACTION)
 .PHONY: cleandir
 cleandir:
 	rm -rf $(BDIR)
+
+# Run Program With Logs
+.PHONY: run
+run:
+	$(BDIR)/$(IAEXE)
+
+# Run Program With Logs
+.PHONY: debug
+debug:
+	$(eval logFile := $(SDIR)/logs/$(shell date +%Y-%m-%d-%H:%M:%S)-error.log)
+	mkdir -p $(SDIR)/logs
+	echo "Log File: " $(logFile)
+	$(BDIR)/$(IAEXE) debug 2> $(logFile)
+	echo "Program Ended"
+	echo "Log File: " $(logFile)
+
+# Delete Log Files (BEWARE OF YOUR ACTION)
+.PHONY: cleanlog
+cleanlog:
+	rm -rf $(SDIR)/logs/*.log
+
+# Delete Entire Log Directory (BEWARE OF YOUR ACTION)
+.PHONY: cleanlogdir
+cleanlogdir:
+	rm -rf $(SDIR)/logs
+
+# ZIP Directory
+.PHONY: zip
+zip:
+	zip -r $(FNAME) ./ \
+	-x $(BDIR)/* \
+	-x logs/* \
+	-x .git/*
